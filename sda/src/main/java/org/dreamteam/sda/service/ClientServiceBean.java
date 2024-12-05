@@ -1,33 +1,52 @@
 package org.dreamteam.sda.service;
 
+import ch.qos.logback.core.util.StringUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.dreamteam.sda.controller.requet.UpdateClient;
 import org.dreamteam.sda.model.Client;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+@Slf4j
 @Service
 public class ClientServiceBean implements ClientService{
 
     private final Map<String, Client> clients = new HashMap<>();
 
     @Override
-    public void addClient(Client client) {
+    public Client addClient(String name, String address) {
+        Client client = new Client(UUID.randomUUID().toString(), name, address);
         if(clients.containsKey(client.id())){
             throw new IllegalArgumentException("Client with id " + client.id() + " already exists");
         }
         clients.put(client.id(), client);
+        log.info("Client with id " + client.id() + " added");
+        return client;
     }
 
     @Override
-    public void updateClient(Client client) {
-        if(!clients.containsKey(client.id())){
-            throw new IllegalArgumentException("Client with id " + client.id() + " does not exist");
+    public Client updateClient(String id, UpdateClient updateClient) {
+        if(!clients.containsKey(id)){
+            throw new IllegalArgumentException("Client with id " + id + " does not exist");
         }
-        clients.put(client.id(), client);
-
+        var client = clients.get(id);
+        var builder = Client.builder().id(id);
+        if(StringUtils.hasText(updateClient.name())){
+            builder.name(updateClient.name());
+            } else {
+            builder.name(client.name());
+        }
+        if(StringUtils.hasText(updateClient.address())){
+            builder.address(updateClient.address());
+        } else {
+            builder.address(client.address());
+        }
+        var updated = builder.build();
+        clients.put(id, updated);
+        log.info("Client with id " + client.id() + " updated");
+        return updated;
     }
 
     @Override
@@ -36,7 +55,7 @@ public class ClientServiceBean implements ClientService{
             throw new IllegalArgumentException("Client with id " + id + " does not exist");
         }
         clients.remove(id);
-
+        log.info("Client with id " + id + " deleted");
     }
 
     @Override
@@ -45,6 +64,7 @@ public class ClientServiceBean implements ClientService{
             throw new IllegalArgumentException("Client with id " + id + " does not exist");
         }
         return clients.get(id);
+
     }
 
     @Override
@@ -53,5 +73,6 @@ public class ClientServiceBean implements ClientService{
            return null;
        }
        return new ArrayList<>(clients.values());
+
     }
 }

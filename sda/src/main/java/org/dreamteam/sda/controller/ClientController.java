@@ -1,11 +1,15 @@
 package org.dreamteam.sda.controller;
 
 import io.micrometer.common.lang.NonNull;
+import org.dreamteam.sda.controller.requet.CreateClient;
+import org.dreamteam.sda.controller.requet.UpdateClient;
 import org.dreamteam.sda.model.Client;
 import org.dreamteam.sda.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -20,8 +24,10 @@ class ClientController {
     }
 
     @PostMapping("/")
-    void addClient(Client client) {
-        clientService.addClient(client);
+    ResponseEntity <Object> addClient(@RequestBody CreateClient client) {
+        Client created = clientService.addClient(client.name(), client.address());
+        //return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.created(URI.create("/clients/" + created.id())).body(created);
     }
 
     @GetMapping("/")
@@ -35,13 +41,15 @@ class ClientController {
     }
 
     @DeleteMapping("/{id}")
-    void removeClient(@PathVariable("id") String id) {
+    ResponseEntity<Object> deleteClient(@PathVariable("id") String id) {
         clientService.deleteClient(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
-    void updateClient(@PathVariable("id") String id, Client client) {
-        clientService.updateClient(client);
+    ResponseEntity<Client> updateClient(@PathVariable("id") String id, @RequestBody UpdateClient client) {
+        var updated = clientService.updateClient(id, client);
+        return ResponseEntity.ok(updated);
     }
 
 }
