@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h2>Clients</h2>
+<div th:switch="${clients}">
+  <h2 th:case="null">No clients yet!</h2>
+  <div th:case="*">
+    <table>
+      <thead>
+      <tr>
+        <th>Name</th>
+        <th>Address</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="client : ${clients}">
+        <td th:text="${client.name}"></td>
+        <td th:text="${client.address}"></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</body>
+</html>

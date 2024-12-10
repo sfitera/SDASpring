@@ -1,4 +1,4 @@
-package org.dreamteam.sda.controller;
+package org.dreamteam.sda.controller.rest;
 
 import io.micrometer.common.lang.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -16,13 +16,13 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/products")
-class ProductController {
+@RequestMapping("/rest/products")
+class ProductApi {
 
     private final ProductService productService;
 
     @Autowired
-    ProductController(ProductService productService) {
+    ProductApi(ProductService productService) {
         this.productService = productService;
     }
 
