@@ -1,8 +1,8 @@
 package org.dreamteam.sda.service;
 
-import ch.qos.logback.core.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dreamteam.sda.controller.requet.UpdateClient;
+import org.dreamteam.sda.exception.NotFoundException;
 import org.dreamteam.sda.model.Client;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -17,6 +17,12 @@ public class ClientServiceBean implements ClientService{
 
     @Override
     public Client addClient(String name, String address) {
+        if(!StringUtils.hasText(name)) {
+            throw new NotFoundException("Client name cannot be empty");
+        }
+        if(!StringUtils.hasText(address)) {
+            throw new NotFoundException("Client address cannot be empty");
+        }
         Client client = new Client(UUID.randomUUID().toString(), name, address);
         if(clients.containsKey(client.id())){
             throw new IllegalArgumentException("Client with id " + client.id() + " already exists");
@@ -29,7 +35,7 @@ public class ClientServiceBean implements ClientService{
     @Override
     public Client updateClient(String id, UpdateClient updateClient) {
         if(!clients.containsKey(id)){
-            throw new IllegalArgumentException("Client with id " + id + " does not exist");
+            throw new NotFoundException("Client with id " + id + " does not exist");
         }
         var client = clients.get(id);
         var builder = Client.builder().id(id);
@@ -52,7 +58,7 @@ public class ClientServiceBean implements ClientService{
     @Override
     public void deleteClient(String id) {
         if(!clients.containsKey(id)){
-            throw new IllegalArgumentException("Client with id " + id + " does not exist");
+            throw new NotFoundException("Client with id " + id + " does not exist");
         }
         clients.remove(id);
         log.info("Client with id " + id + " deleted");
@@ -61,7 +67,7 @@ public class ClientServiceBean implements ClientService{
     @Override
     public Client getClient(String id) {
         if(!clients.containsKey(id)){
-            throw new IllegalArgumentException("Client with id " + id + " does not exist");
+            throw new NotFoundException("Client with id " + id + " does not exist");
         }
         return clients.get(id);
 

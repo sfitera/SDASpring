@@ -2,6 +2,7 @@ package org.dreamteam.sda.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dreamteam.sda.controller.requet.UpdateProduct;
+import org.dreamteam.sda.exception.NotFoundException;
 import org.dreamteam.sda.model.Product;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -16,6 +17,12 @@ public class ProductServiceBean implements ProductService{
 
     @Override
     public Product addProduct(String name, String price) {
+        if(!StringUtils.hasText(name)) {
+            throw new NotFoundException("Product name cannot be empty");
+        }
+        if(!StringUtils.hasText(price)) {
+            throw new NotFoundException("Product price cannot be empty");
+        }
         Product Product = new Product(UUID.randomUUID().toString(), name, price);
         if(products.containsKey(Product.id())){
             throw new IllegalArgumentException("Product with id " + Product.id() + " already exists");
@@ -28,30 +35,30 @@ public class ProductServiceBean implements ProductService{
     @Override
     public Product updateProduct(String id, UpdateProduct updateProduct) {
         if(!products.containsKey(id)){
-            throw new IllegalArgumentException("Product with id " + id + " does not exist");
+            throw new NotFoundException("Product with id " + id + " does not exist");
         }
-        var Product = products.get(id);
+        var product = products.get(id);
         var builder = Product.builder().id(id);
         if(StringUtils.hasText(updateProduct.name())){
             builder.name(updateProduct.name());
             } else {
-            builder.name(Product.name());
+            builder.name(product.name());
         }
         if(StringUtils.hasText(updateProduct.price())){
             builder.price(updateProduct.price());
         } else {
-            builder.price(Product.price());
+            builder.price(product.price());
         }
         var updated = builder.build();
         products.put(id, updated);
-        log.info("Product with id " + Product.id() + " updated");
+        log.info("Product with id " + product.id() + " updated");
         return updated;
     }
 
     @Override
     public void deleteProduct(String id) {
         if(!products.containsKey(id)){
-            throw new IllegalArgumentException("Product with id " + id + " does not exist");
+            throw new NotFoundException("Product with id " + id + " does not exist");
         }
         products.remove(id);
         log.info("Product with id " + id + " deleted");
@@ -60,7 +67,7 @@ public class ProductServiceBean implements ProductService{
     @Override
     public Product getProduct(String id) {
         if(!products.containsKey(id)){
-            throw new IllegalArgumentException("Product with id " + id + " does not exist");
+            throw new NotFoundException("Product with id " + id + " does not exist");
         }
         return products.get(id);
 
