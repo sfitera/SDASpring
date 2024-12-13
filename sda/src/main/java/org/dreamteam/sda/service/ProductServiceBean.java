@@ -1,19 +1,25 @@
 package org.dreamteam.sda.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dreamteam.sda.controller.requet.UpdateProduct;
 import org.dreamteam.sda.exception.NotFoundException;
 import org.dreamteam.sda.model.Product;
+import org.dreamteam.sda.repository.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 @Service
 public class ProductServiceBean implements ProductService{
 
-    private final Map<String, Product> products = new HashMap<>();
+    private final ProductRepository productRepository;
+    @Autowired
+    ProductServiceBean(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
 
     @Override
     public Product addProduct(String name, String price) {
@@ -23,62 +29,62 @@ public class ProductServiceBean implements ProductService{
         if(!StringUtils.hasText(price)) {
             throw new NotFoundException("Product price cannot be empty");
         }
-        Product Product = new Product(UUID.randomUUID().toString(), name, price);
-        if(products.containsKey(Product.id())){
-            throw new IllegalArgumentException("Product with id " + Product.id() + " already exists");
+        var product = new Product(UUID.randomUUID().toString(), name, price);
+        if (productRepository.existsById(product.getId())) {
+            throw new IllegalArgumentException("Client with id " + product.getId() + " already exists");
         }
-        products.put(Product.id(), Product);
-        log.info("Product with id " + Product.id() + " added");
-        return Product;
+        productRepository.save(product);
+        log.info("Product added: {}", product);
+        return product;
     }
 
     @Override
-    public Product updateProduct(String id, UpdateProduct updateProduct) {
-        if(!products.containsKey(id)){
+    public Product updateProduct(String id, Product updateProduct) {
+        if(!productRepository.existsById(id)){
             throw new NotFoundException("Product with id " + id + " does not exist");
         }
-        var product = products.get(id);
-        var builder = Product.builder().id(id);
-        if(StringUtils.hasText(updateProduct.name())){
-            builder.name(updateProduct.name());
+        var product = productRepository
+                .findById(id)
+                .orElseThrow(() -> new NotFoundException("Client with id " + id + " does not exist"));
+        var updated = new Product();
+        if (StringUtils.hasText(updateProduct.getName())) {
+            updated.setName(updateProduct.getName());
             } else {
-            builder.name(product.name());
+            updated.setName(product.getName());
         }
-        if(StringUtils.hasText(updateProduct.price())){
-            builder.price(updateProduct.price());
+        if (StringUtils.hasText(updateProduct.getPrice())) {
+            updated.setPrice(updateProduct.getPrice());
         } else {
-            builder.price(product.price());
+            updated.setPrice(updateProduct.getPrice());
         }
-        var updated = builder.build();
-        products.put(id, updated);
-        log.info("Product with id " + product.id() + " updated");
+        productRepository.save(updated);
+        log.info("Product updated: {}", updated);
         return updated;
     }
 
     @Override
     public void deleteProduct(String id) {
-        if(!products.containsKey(id)){
+        if(!productRepository.existsById(id)){
             throw new NotFoundException("Product with id " + id + " does not exist");
         }
-        products.remove(id);
+        productRepository.deleteById(id);
         log.info("Product with id " + id + " deleted");
     }
 
     @Override
     public Product getProduct(String id) {
-        if(!products.containsKey(id)){
+        if(!productRepository.existsById(id)){
             throw new NotFoundException("Product with id " + id + " does not exist");
         }
-        return products.get(id);
+        return productRepository
+                .findById(id)
+                .orElseThrow(()-> new NotFoundException("Product with id " + id + " does not exist"));
 
     }
 
     @Override
     public List<Product> getProducts() {
-       if(products.isEmpty()){
-           return null;
-       }
-       return new ArrayList<>(products.values());
+        return StreamSupport.stream(productRepository.findAll().spliterator(),false).toList();
 
     }
 }

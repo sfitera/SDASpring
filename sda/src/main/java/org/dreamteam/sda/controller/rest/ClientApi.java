@@ -3,7 +3,7 @@ package org.dreamteam.sda.controller.rest;
 import io.micrometer.common.lang.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.dreamteam.sda.controller.requet.CreateClient;
-import org.dreamteam.sda.controller.requet.UpdateClient;
+import org.dreamteam.sda.controller.rest.request.UpdateClient;
 import org.dreamteam.sda.exception.NotFoundException;
 import org.dreamteam.sda.model.Client;
 import org.dreamteam.sda.service.ClientService;
@@ -30,7 +30,7 @@ class ClientApi {
     ResponseEntity <Object> addClient(@RequestBody CreateClient client) {
         Client created = clientService.addClient(client.name(), client.address());
         //return ResponseEntity.status(HttpStatus.CREATED).build();
-        return ResponseEntity.created(URI.create("/clients/" + created.id())).body(created);
+        return ResponseEntity.created(URI.create("/clients/" + created.getId())).body(created);
     }
 
     @GetMapping("/")
@@ -51,7 +51,7 @@ class ClientApi {
 
     @PutMapping("/{id}")
     ResponseEntity<Client> updateClient(@PathVariable("id") String id, @RequestBody UpdateClient client) {
-        var updated = clientService.updateClient(id, client);
+        var updated = clientService.updateClient(id, new Client(id, client.name(), client.address()));
         return ResponseEntity.ok(updated);
     }
 

@@ -10,10 +10,10 @@ import lombok.NonNull;
 @Data
 @EqualsAndHashCode
 @Builder
-public class UpdateClient {
+public class UpdateProduct {
         @NonNull String id;
         @NotBlank(message = "Name is required") String name;
-        @NotBlank(message = "Address is required") String address;
+        @NotBlank(message = "Price is required") String price;
 
 
 }

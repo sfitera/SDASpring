@@ -3,16 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+  <style>
+    .error {
+      color: red;
+    }
+    input.error {
+      color: black;
+      border: 1px solid red;
+    }
+  </style>
 </head>
 <body>
 <h2>Products</h2>
 
 <h3>Add new products</h3>
-<form action="#" th:action="@{/products/add}" th:object="${product}" method="post">
+<form action="#" th:action="@{/products/add}" th:object="${createProduct}" method="post">
   <label for="name">Name</label>
   <input type="text" th:field="*{name}" id="name" placeholder="Name">
+  <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" th:errorclass="error"></span>
   <label for="price">Price</label>
   <input type="text" th:field="*{price}" id="price" placeholder="Price">
+  <span th:if="${#fields.hasErrors('price')}" th:errors="*{price}" th:errorclass="error"></span>
   <input type="submit" value="Add">
 </form>
 

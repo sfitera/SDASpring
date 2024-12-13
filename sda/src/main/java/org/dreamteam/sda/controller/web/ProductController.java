@@ -1,22 +1,19 @@
 package org.dreamteam.sda.controller.web;
 
-import io.micrometer.common.lang.NonNull;
+
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.dreamteam.sda.controller.requet.CreateProduct;
-import org.dreamteam.sda.controller.requet.UpdateClient;
-import org.dreamteam.sda.controller.requet.UpdateProduct;
-import org.dreamteam.sda.exception.NotFoundException;
-import org.dreamteam.sda.model.Client;
+import org.dreamteam.sda.controller.web.request.CreateProduct;
+import org.dreamteam.sda.controller.web.request.UpdateProduct;
 import org.dreamteam.sda.model.Product;
 import org.dreamteam.sda.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-import java.util.List;
+
 
 @Slf4j
 @Controller
@@ -33,13 +30,18 @@ class ProductController {
     @GetMapping("/")
     String getAllProducts(Model model) {
         model.addAttribute("products",productService.getProducts());
-        model.addAttribute("product", Product.builder().build());
+        model.addAttribute("createProduct", new Product());
         return "products";
     }
 
     @PostMapping("/add")
-    String addProduct(Product product, Model model) {
-        productService.addProduct(product.name(),product.price());
+    String addProduct(@Valid CreateProduct product, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("products",productService.getProducts());
+            model.addAttribute("createProduct", product);
+            return "products";
+        }
+        productService.addProduct(product.getName(),product.getPrice());
         return "redirect:/products/";
     }
 
@@ -50,14 +52,19 @@ class ProductController {
     }
 
     @PostMapping("/update/{id}")
-    String updateProduct(@PathVariable String id, UpdateProduct product, Model model) {
-        productService.updateProduct(id, product);
+    String updateProduct(@PathVariable String id, @Valid UpdateProduct product, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            product.setId(id);
+            model.addAttribute("updateProduct", product);
+            return "edit_product";
+        }
+        productService.updateProduct(product.getId(), new Product(product.getId(), product.getName(), product.getPrice()));
         return "redirect:/products/";
     }
 
     @GetMapping("/edit/{id}")
     String updateProduct(@PathVariable String id, Model model) {
-        model.addAttribute("product",productService.getProduct(id));
+        model.addAttribute("updateProduct",productService.getProduct(id));
         return "edit_product";
     }
 

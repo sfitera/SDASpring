@@ -2,7 +2,8 @@ package org.dreamteam.sda.controller.web;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.dreamteam.sda.controller.requet.UpdateClient;
+import org.dreamteam.sda.controller.web.request.CreateClient;
+import org.dreamteam.sda.controller.web.request.UpdateClient;
 import org.dreamteam.sda.model.Client;
 import org.dreamteam.sda.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +27,18 @@ class ClientController {
     @GetMapping("/")
     String getAllClients(Model model) {
         model.addAttribute("clients",clientService.getClients());
-        model.addAttribute("client", Client.builder().build());
+        model.addAttribute("createClient", new Client());
         return "clients";
     }
 
     @PostMapping("/add")
-    String addClient(Client client, Model model) {
-        clientService.addClient(client.name(),client.address());
+    String addClient(@Valid CreateClient client, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("clients",clientService.getClients());
+            model.addAttribute("createClient", client);
+            return "clients";
+        }
+        clientService.addClient(client.getName(), client.getAddress());
         return "redirect:/clients/";
     }
 
@@ -44,16 +50,19 @@ class ClientController {
 
     @PostMapping("/update/{id}")
     String updateClient(@PathVariable String id, @Valid UpdateClient client, BindingResult result, Model model) {
-        if(result.hasErrors()) {
+        if (result.hasErrors()) {
+            client.setId(id);
+            model.addAttribute("updateClient", client);
             return "edit_client";
         }
-        clientService.updateClient(id, client);
+        clientService.updateClient(client.getId(), new Client(client.getId(), client.getName(), client.getAddress()));
+
         return "redirect:/clients/";
     }
 
     @GetMapping("/edit/{id}")
     String updateClient(@PathVariable String id, Model model) {
-        model.addAttribute("client",clientService.getClient(id));
+        model.addAttribute("updateClient",clientService.getClient(id));
         return "edit_client";
     }
 

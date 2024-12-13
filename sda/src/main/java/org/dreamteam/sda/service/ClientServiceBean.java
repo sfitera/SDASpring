@@ -1,19 +1,26 @@
 package org.dreamteam.sda.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dreamteam.sda.controller.requet.UpdateClient;
 import org.dreamteam.sda.exception.NotFoundException;
 import org.dreamteam.sda.model.Client;
+import org.dreamteam.sda.repository.ClientRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 @Service
 public class ClientServiceBean implements ClientService{
 
-    private final Map<String, Client> clients = new HashMap<>();
+    private final ClientRepository clientRepository;
+
+    @Autowired
+    ClientServiceBean(ClientRepository clientRepository) {
+        this.clientRepository = clientRepository;
+    }
 
     @Override
     public Client addClient(String name, String address) {
@@ -24,61 +31,55 @@ public class ClientServiceBean implements ClientService{
             throw new NotFoundException("Client address cannot be empty");
         }
         Client client = new Client(UUID.randomUUID().toString(), name, address);
-        if(clients.containsKey(client.id())){
-            throw new IllegalArgumentException("Client with id " + client.id() + " already exists");
+        if (clientRepository.existsById(client.getId())) {
+            throw new IllegalArgumentException("Client with id " + client.getId() + " already exists");
         }
-        clients.put(client.id(), client);
-        log.info("Client with id " + client.id() + " added");
+        clientRepository.save(client);
+        log.info("Client added: {}", client);
         return client;
     }
 
     @Override
-    public Client updateClient(String id, UpdateClient updateClient) {
-        if(!clients.containsKey(id)){
-            throw new NotFoundException("Client with id " + id + " does not exist");
-        }
-        var client = clients.get(id);
-        var builder = Client.builder().id(id);
-        if(StringUtils.hasText(updateClient.name())){
-            builder.name(updateClient.name());
+    public Client updateClient(String id, Client updateClient) {
+        var client = clientRepository
+                .findById(id)
+                .orElseThrow(() -> new NotFoundException("Client with id " + id + " does not exist"));
+        var updated = new Client();
+        if (StringUtils.hasText(updateClient.getName())) {
+            updated.setName(updateClient.getName());
             } else {
-            builder.name(client.name());
+            updated.setName(client.getName());
         }
-        if(StringUtils.hasText(updateClient.address())){
-            builder.address(updateClient.address());
+        if (StringUtils.hasText(updateClient.getAddress())) {
+            updated.setAddress(updateClient.getAddress());
         } else {
-            builder.address(client.address());
+            updated.setAddress(client.getAddress());
         }
-        var updated = builder.build();
-        clients.put(id, updated);
-        log.info("Client with id " + client.id() + " updated");
+        clientRepository.save(updated);
+        log.info("Client updated: {}", updated);
         return updated;
     }
 
     @Override
     public void deleteClient(String id) {
-        if(!clients.containsKey(id)){
+        if (!clientRepository.existsById(id)) {
             throw new NotFoundException("Client with id " + id + " does not exist");
         }
-        clients.remove(id);
+        clientRepository.deleteById(id);
         log.info("Client with id " + id + " deleted");
     }
 
     @Override
     public Client getClient(String id) {
-        if(!clients.containsKey(id)){
-            throw new NotFoundException("Client with id " + id + " does not exist");
-        }
-        return clients.get(id);
+        return clientRepository
+                .findById(id)
+                .orElseThrow(() -> new NotFoundException("Client with id " + id + " does not exist"));
 
     }
 
     @Override
     public List<Client> getClients() {
-       if(clients.isEmpty()){
-           return null;
-       }
-       return new ArrayList<>(clients.values());
+        return StreamSupport.stream(clientRepository.findAll().spliterator(), false).toList();
 
     }
 }

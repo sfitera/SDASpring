@@ -10,8 +10,7 @@ import lombok.NonNull;
 @Data
 @EqualsAndHashCode
 @Builder
-public class UpdateClient {
-        @NonNull String id;
+public class CreateClient {
         @NotBlank(message = "Name is required") String name;
         @NotBlank(message = "Address is required") String address;
 
