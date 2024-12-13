@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<h2>Products</h2>
+
+<h3>Edit existing product</h3>
+<form action="#" th:action="@{/products/update/{id}(id=${product.id})}" th:object="${product}" method="post">
+  <label for="name">Name</label>
+  <input type="text" th:field="*{name}" id="name" placeholder="Name">
+  <label for="price">Address</label>
+  <input type="text" th:field="*{price}" id="price" placeholder="Price">
+  <input type="submit" value="Edit">
+</form>
+<p></p>
+
+</body>
+</html>

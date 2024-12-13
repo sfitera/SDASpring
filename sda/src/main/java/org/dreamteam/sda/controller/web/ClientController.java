@@ -1,20 +1,15 @@
 package org.dreamteam.sda.controller.web;
 
-import io.micrometer.common.lang.NonNull;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.dreamteam.sda.controller.requet.CreateClient;
 import org.dreamteam.sda.controller.requet.UpdateClient;
-import org.dreamteam.sda.exception.NotFoundException;
 import org.dreamteam.sda.model.Client;
 import org.dreamteam.sda.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
-import java.util.List;
 
 @Slf4j
 @Controller
@@ -31,48 +26,35 @@ class ClientController {
     @GetMapping("/")
     String getAllClients(Model model) {
         model.addAttribute("clients",clientService.getClients());
+        model.addAttribute("client", Client.builder().build());
         return "clients";
     }
 
-
-
-
-
-
-
-    @PostMapping("/")
-    ResponseEntity <Object> addClient(@RequestBody CreateClient client) {
-        Client created = clientService.addClient(client.name(), client.address());
-        //return ResponseEntity.status(HttpStatus.CREATED).build();
-        return ResponseEntity.created(URI.create("/clients/" + created.id())).body(created);
+    @PostMapping("/add")
+    String addClient(Client client, Model model) {
+        clientService.addClient(client.name(),client.address());
+        return "redirect:/clients/";
     }
 
-    @GetMapping("/{id}")
-    Client getClient(@NonNull @PathVariable("id") String id) {
-        return clientService.getClient(id);
-    }
-
-    @DeleteMapping("/{id}")
-    ResponseEntity<Object> deleteClient(@PathVariable("id") String id) {
+    @GetMapping("/delete/{id}")
+    String deleteClient(@PathVariable String id, Model model) {
         clientService.deleteClient(id);
-        return ResponseEntity.noContent().build();
+        return "redirect:/clients/";
     }
 
-    @PutMapping("/{id}")
-    ResponseEntity<Client> updateClient(@PathVariable("id") String id, @RequestBody UpdateClient client) {
-        var updated = clientService.updateClient(id, client);
-        return ResponseEntity.ok(updated);
+    @PostMapping("/update/{id}")
+    String updateClient(@PathVariable String id, @Valid UpdateClient client, BindingResult result, Model model) {
+        if(result.hasErrors()) {
+            return "edit_client";
+        }
+        clientService.updateClient(id, client);
+        return "redirect:/clients/";
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
-        log.error(ex.getMessage());
-        return ResponseEntity.notFound().build();
+    @GetMapping("/edit/{id}")
+    String updateClient(@PathVariable String id, Model model) {
+        model.addAttribute("client",clientService.getClient(id));
+        return "edit_client";
     }
 
-    @ExceptionHandler(NotFoundException.class)
-    ResponseEntity<Object> handleNotFoundException(NotFoundException ex) {
-        log.error(ex.getMessage());
-        return ResponseEntity.notFound().build();
-    }
 }

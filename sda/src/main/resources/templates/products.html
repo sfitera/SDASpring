@@ -6,6 +6,16 @@
 </head>
 <body>
 <h2>Products</h2>
+
+<h3>Add new products</h3>
+<form action="#" th:action="@{/products/add}" th:object="${product}" method="post">
+  <label for="name">Name</label>
+  <input type="text" th:field="*{name}" id="name" placeholder="Name">
+  <label for="price">Price</label>
+  <input type="text" th:field="*{price}" id="price" placeholder="Price">
+  <input type="submit" value="Add">
+</form>
+
 <div th:switch="${products}">
   <h2 th:case="null">No products yet!</h2>
   <div th:case="*">
@@ -18,8 +28,10 @@
       </thead>
       <tbody>
       <tr th:each="product : ${products}">
-        <td th:text="${product.name}"></td>
-        <td th:text="${product.price}"></td>
+        <td th:text="${product.name}">Name</td>
+        <td th:text="${product.price}">Price</td>
+        <td><a th:href="@{/products/edit/{id}(id=${product.id})}">Edit</a></td>
+        <td><a th:href="@{/products/delete/{id}(id=${product.id})}">Delete</a></td>
       </tr>
       </tbody>
     </table>

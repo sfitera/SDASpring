@@ -3,8 +3,10 @@ package org.dreamteam.sda.controller.web;
 import io.micrometer.common.lang.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.dreamteam.sda.controller.requet.CreateProduct;
+import org.dreamteam.sda.controller.requet.UpdateClient;
 import org.dreamteam.sda.controller.requet.UpdateProduct;
 import org.dreamteam.sda.exception.NotFoundException;
+import org.dreamteam.sda.model.Client;
 import org.dreamteam.sda.model.Product;
 import org.dreamteam.sda.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,50 +33,33 @@ class ProductController {
     @GetMapping("/")
     String getAllProducts(Model model) {
         model.addAttribute("products",productService.getProducts());
+        model.addAttribute("product", Product.builder().build());
         return "products";
     }
 
-
-
-
-
-
-
-    @PostMapping("/")
-    ResponseEntity <Object> addProduct(@RequestBody CreateProduct product) {
-        Product created = productService.addProduct(product.name(), product.price());
-        //return ResponseEntity.status(HttpStatus.CREATED).build();
-        return ResponseEntity.created(URI.create("/products/" + created.id())).body(created);
+    @PostMapping("/add")
+    String addProduct(Product product, Model model) {
+        productService.addProduct(product.name(),product.price());
+        return "redirect:/products/";
     }
 
-
-    @GetMapping("/{id}")
-    Product getProduct(@NonNull @PathVariable("id") String id) {
-        return productService.getProduct(id);
-    }
-
-    @DeleteMapping("/{id}")
-    ResponseEntity<Object> deleteProduct(@PathVariable("id") String id) {
+    @GetMapping("/delete/{id}")
+    String deleteProduct(@PathVariable String id, Model model) {
         productService.deleteProduct(id);
-        return ResponseEntity.noContent().build();
+        return "redirect:/products/";
     }
 
-    @PutMapping("/{id}")
-    ResponseEntity<Product> updateProduct(@PathVariable("id") String id, @RequestBody UpdateProduct product) {
-        var updated = productService.updateProduct(id, product);
-        return ResponseEntity.ok(updated);
+    @PostMapping("/update/{id}")
+    String updateProduct(@PathVariable String id, UpdateProduct product, Model model) {
+        productService.updateProduct(id, product);
+        return "redirect:/products/";
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
-        log.error(ex.getMessage());
-        return ResponseEntity.notFound().build();
-    }
-
-    @ExceptionHandler(NotFoundException.class)
-    ResponseEntity<Object> handleNotFoundException(NotFoundException ex) {
-        log.error(ex.getMessage());
-        return ResponseEntity.notFound().build();
+    @GetMapping("/edit/{id}")
+    String updateProduct(@PathVariable String id, Model model) {
+        model.addAttribute("product",productService.getProduct(id));
+        return "edit_product";
     }
 
 }
+
