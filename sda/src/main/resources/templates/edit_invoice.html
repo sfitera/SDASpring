@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+    .error {
+      color: red;
+    }
+    input.error {
+      color: black;
+      border: 1px solid red;
+    }
+  </style>
+</head>
+<body>
+<h2>Invoices</h2>
+
+<h3>Edit existing invoice</h3>
+<form action="#" th:action="@{/invoices/update/{id}(id=${updateInvoice.id})}" th:object="${updateInvoice}" method="post">
+  <label for="name">Client</label>
+  <input type="text" th:field="*{client}" id="name" placeholder="Name" th:errorclass="error">
+  <span th:if="${#fields.hasErrors('name')}" th:errors="*{client}" th:errorclass="error"></span>
+  <label for="address">D ate</label>
+  <input type="text" th:field="*{date}" id="address" placeholder="Address" th:errorclass="error">
+  <span th:if="${#fields.hasErrors('address')}" th:errors="*{date}" th:errorclass="error"></span>
+  <input type="submit" value="Edit">
+</form>
+<p></p>
+
+</body>
+</html>

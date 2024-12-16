@@ -1,6 +1,5 @@
 package org.dreamteam.sda.service;
 
-import org.dreamteam.sda.controller.requet.UpdateClient;
 import org.dreamteam.sda.model.Client;
 
 import java.util.List;

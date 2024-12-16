@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  <style>
+    .error {
+      color: red;
+    }
+    input.error {
+      color: black;
+      border: 1px solid red;
+    }
+  </style>
+</head>
+<body>
+<h2>Invoices</h2>
+
+<h3>Add new invoice</h3>
+<form action="#" th:action="@{/invoices/add}" th:object="${createInvoice}" method="post">
+  <label for="client">Client</label>
+  <select id="client" th:field="*{client}">
+    <option
+            th:each="client : ${clientList}"
+            th:value="${client}"
+            th:text="${client.name}">
+    </option>
+  </select>
+  <span th:if="${#fields.hasErrors('client')}" th:errors="*{client}" th:errorclass="error"></span>
+  <label for="date">Date</label>
+  <input type="text" th:field="*{date}" id="date" placeholder="Date" th:errorclass="error">
+  <span th:if="${#fields.hasErrors('date')}" th:errors="*{date}" th:errorclass="error"></span>
+  <input type="submit" value="Add">
+</form>
+<p></p>
+<div th:switch="${invoices}">
+  <h2 th:case="null">No invoices yet!</h2>
+  <div th:case="*">
+    <table>
+      <thead>
+      <tr>
+        <th>Client</th>
+        <th>Date</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="invoice : ${invoices}">
+        <td th:text="${invoice.client}"></td>
+        <td th:text="${invoice.date}"></td>
+        <td><a th:href="@{/invoices/edit/{id}(id=${invoice.id})}">Edit</a></td>
+        <td><a th:href="@{/invoices/delete/{id}(id=${invoice.id})}">Delete</a></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</body>
+</html>
