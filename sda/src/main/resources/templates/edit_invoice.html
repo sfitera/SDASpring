@@ -1,32 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-  <style>
-    .error {
-      color: red;
-    }
-    input.error {
-      color: black;
-      border: 1px solid red;
-    }
-  </style>
-</head>
+<head th:replace="fragments/header :: head"></head>
 <body>
-<h2>Invoices</h2>
+<div id="menu" th:insert="fragments/menu :: menu"></div>
+<div id="page">
+  <h2 th:text="${pageTitle}"></h2>
+  <h3>Edit existing invoice</h3>
+  <form action="#" th:action="@{/invoices/update/}" th:object="${updateInvoice}" method="post">
+    <input type="hidden" th:field="*{invoiceId}" />
+    <label for="client">Client</label>
+    <select id="client" th:field="*{clientId}">
+      <option th:each="client : ${clientList}" th:value="${client.id}" th:text="${client.name}"></option>
+      <span th:if="${#fields.hasErrors('clientID')}" th:errors="*{clientId}" th:errorclass="error"></span>
+    </select>
+    <label for="date">Date</label>
+    <input type="text" th:field="*{date}" id="date" placeholder="Date" th:errorclass="error">
+    <span th:if="${#fields.hasErrors('date')}" th:errors="*{date}" th:errorclass="error"></span>
+    <p>
+      <button type="submit">Update</button>
+    </p>
+  </form>
 
-<h3>Edit existing invoice</h3>
-<form action="#" th:action="@{/invoices/update/{id}(id=${updateInvoice.id})}" th:object="${updateInvoice}" method="post">
-  <label for="name">Client</label>
-  <input type="text" th:field="*{client}" id="name" placeholder="Name" th:errorclass="error">
-  <span th:if="${#fields.hasErrors('name')}" th:errors="*{client}" th:errorclass="error"></span>
-  <label for="address">D ate</label>
-  <input type="text" th:field="*{date}" id="address" placeholder="Address" th:errorclass="error">
-  <span th:if="${#fields.hasErrors('address')}" th:errors="*{date}" th:errorclass="error"></span>
-  <input type="submit" value="Edit">
-</form>
-<p></p>
+  <h3>Add New Invoice Item</h3>
+  <form action="#" th:action="@{/invoices/{invoiceId}/items/add(invoiceId=${updateInvoice.invoiceId})}" th:object="${createInvoiceItem}" method="post">
+    <p>Product: <select th:field="*{productId}">
+      <option th:each="product : ${productList}" th:value="${product.id}" th:text="${product.name}"></option>
+    </select></p>
+    <p>Amount: <input type="text" th:field="*{amount}"/></p>
+    <p>
+      <button type="submit">Add</button>
+    </p>
+  </form>
+
+  <div th:switch="${#lists.size(orderItems)}">
+    <p th:case="0">No order items</p>
+    <div th:case="*">
+      <table>
+        <thead>
+        <tr>
+          <th>Product</th>
+          <th>Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${orderItems}">
+          <td th:text="${item.product.name}">Name</td>
+          <td th:text="${item.amount}">Amount</td>
+          <td><a th:href="@{/orders/{orderId}/items/{itemId}/delete(orderId=${updateOrder.orderId},itemId=${item.id})}">Delete</a></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

@@ -1,4 +1,4 @@
-package org.dreamteam.sda.controller.requet;
+package org.dreamteam.sda.controller.rest.request;
 
 import lombok.NonNull;
 

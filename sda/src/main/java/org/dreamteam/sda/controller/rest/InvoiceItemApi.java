@@ -3,12 +3,14 @@ package org.dreamteam.sda.controller.rest;
 import io.micrometer.common.lang.NonNull;
 import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
-import org.dreamteam.sda.controller.rest.request.CreateInvoice;
-import org.dreamteam.sda.controller.rest.request.UpdateInvoice;
+import org.dreamteam.sda.controller.rest.request.CreateInvoiceItem;
+import org.dreamteam.sda.controller.rest.request.UpdateInvoiceItem;
 import org.dreamteam.sda.exception.NotFoundException;
-import org.dreamteam.sda.model.Invoice;
+import org.dreamteam.sda.model.InvoiceItem;
 import org.dreamteam.sda.service.ClientService;
+import org.dreamteam.sda.service.InvoiceItemService;
 import org.dreamteam.sda.service.InvoiceService;
+import org.dreamteam.sda.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,42 +23,45 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/rest/invoices")
-class InvoiceApi {
+@RequestMapping("/rest/invoice/{invoiceId}/items")
+class InvoiceItemApi {
 
     private final InvoiceService invoiceService;
 
+
     @Autowired
-    InvoiceApi(InvoiceService invoiceService, ClientService clientService) {
+    InvoiceItemApi(InvoiceService invoiceService) {
         this.invoiceService = invoiceService;
+
     }
 
-    @PostMapping("/")
-    ResponseEntity <Object> addInvoice(@RequestBody CreateInvoice invoice) {
-        Invoice created = invoiceService.addInvoice(invoice.clientId(), invoice.date());
-        //return ResponseEntity.status(HttpStatus.CREATED).build();
-        return ResponseEntity.created(URI.create("/invoices/" + created.getId())).body(created);
+    @PostMapping("/add")
+    ResponseEntity<InvoiceItem> addOrderItem(@NonNull @PathVariable("invoiceId") String invoiceId, @RequestBody CreateInvoiceItem invoiceItem) {
+        InvoiceItem created = invoiceService.addItemToInvoice(invoiceId, invoiceItem.productId(), invoiceItem.amount());
+        return ResponseEntity.created(
+                URI.create(String.format("/orders/%s/items/%s", created.getInvoice().getId(), created.getId()))
+        ).body(created);
     }
 
     @GetMapping("/")
-    List<Invoice> getAllInvoices() {
-        return invoiceService.getInvoices();
+    List<InvoiceItem> getAllInvoiceItems(@NonNull @PathVariable("invoiceId") String invoiceId) {
+        return invoiceService.getAllItemsFor(invoiceId);
     }
 
     @GetMapping("/{id}")
-    Invoice getInvoice(@NonNull @PathVariable("id") String id) {
-        return invoiceService.getInvoice(id);
+    InvoiceItem getInvoiceItem(@NonNull @PathVariable("invoiceId") String invoiceId, @NonNull @PathVariable("id") String id) {
+        return invoiceService.getInvoiceItem(invoiceId, id);
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<Object> deleteInvoice(@PathVariable("id") String id) {
-        invoiceService.deleteInvoice(id);
+    ResponseEntity<Object> deleteInvoiceItem(@NonNull @PathVariable("invoiceId") String invoiceId, @PathVariable("id") String id) {
+        invoiceService.deleteInvoiceItem(invoiceId, id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<Invoice> updateInvoice(@PathVariable("id") String id, @RequestBody UpdateInvoice invoice) {
-        var updated = invoiceService.updateInvoice(id, invoice.clientId(), invoice.date());
+    ResponseEntity<InvoiceItem> updateInvoiceItem(@NonNull @PathVariable("invoiceId") String invoiceId, @PathVariable("id") String id, @RequestBody UpdateInvoiceItem invoice) {
+        var updated = invoiceService.updateInvoiceItem(invoiceId,id,invoice.productId(),invoice.amount());
         return ResponseEntity.ok(updated);
     }
 

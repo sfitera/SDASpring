@@ -2,7 +2,7 @@ package org.dreamteam.sda.controller.rest;
 
 import io.micrometer.common.lang.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.dreamteam.sda.controller.requet.CreateClient;
+import org.dreamteam.sda.controller.rest.request.CreateClient;
 import org.dreamteam.sda.controller.rest.request.UpdateClient;
 import org.dreamteam.sda.exception.NotFoundException;
 import org.dreamteam.sda.model.Client;

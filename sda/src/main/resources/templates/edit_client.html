@@ -1,20 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-  <style>
-    .error {
-      color: red;
-    }
-    input.error {
-      color: black;
-      border: 1px solid red;
-    }
-  </style>
-</head>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layouts/default">
+  <head th:replace="fragments/header :: head"></head>
 <body>
-<h2>Clients</h2>
+<div id="menu" th:insert="fragments/menu :: menu"></div>
+<div id="page">
 
 <h3>Edit existing client</h3>
 <form action="#" th:action="@{/clients/update/{id}(id=${updateClient.id})}" th:object="${updateClient}" method="post">
@@ -27,6 +19,6 @@
   <input type="submit" value="Edit">
 </form>
 <p></p>
-
+</div>
 </body>
 </html>

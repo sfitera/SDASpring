@@ -2,8 +2,8 @@ package org.dreamteam.sda.controller.rest;
 
 import io.micrometer.common.lang.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.dreamteam.sda.controller.requet.CreateProduct;
-import org.dreamteam.sda.controller.requet.UpdateProduct;
+import org.dreamteam.sda.controller.rest.request.CreateProduct;
+import org.dreamteam.sda.controller.rest.request.UpdateProduct;
 import org.dreamteam.sda.exception.NotFoundException;
 import org.dreamteam.sda.model.Product;
 import org.dreamteam.sda.service.ProductService;

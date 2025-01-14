@@ -29,6 +29,7 @@ class ProductController {
 
     @GetMapping("/")
     String getAllProducts(Model model) {
+        setDefaultValues(model);
         model.addAttribute("products",productService.getProducts());
         model.addAttribute("createProduct", new Product());
         return "products";
@@ -64,8 +65,13 @@ class ProductController {
 
     @GetMapping("/edit/{id}")
     String updateProduct(@PathVariable String id, Model model) {
+        setDefaultValues(model);
         model.addAttribute("updateProduct",productService.getProduct(id));
         return "edit_product";
+    }
+
+    private void setDefaultValues(Model model) {
+        model.addAttribute("pageTitle", "Product");
     }
 
 }
