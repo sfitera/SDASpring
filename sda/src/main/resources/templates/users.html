@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layouts/default">
+<head th:replace="fragments/header :: head"></head>
+<body>
+<div id="menu" th:insert="fragments/menu :: menu"></div>
+<div id="page">
+
+    <h3>Manage Users</h3>
+
+    <!-- Formulár na pridanie nového používateľa -->
+    <h4>Add New User</h4>
+    <form action="#" th:action="@{/admin/users/add}" th:object="${user}" method="post">
+        <label for="username">Username:</label>
+        <input type="text" th:field="*{username}" id="username" placeholder="Username" th:errorclass="error">
+        <span th:if="${#fields.hasErrors('username')}" th:errors="*{username}" th:errorclass="error"></span>
+
+        <label for="password">Password:</label>
+        <input type="password" th:field="*{password}" id="password" placeholder="Password" th:errorclass="error">
+        <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" th:errorclass="error"></span>
+
+        <label for="role">Role:</label>
+        <select th:field="*{role}" id="role">
+            <option value="USER">USER</option>
+            <option value="ADMIN">ADMIN</option>
+        </select>
+        <span th:if="${#fields.hasErrors('role')}" th:errors="*{role}" th:errorclass="error"></span>
+
+        <button type="submit">Add User</button>
+    </form>
+
+    <!-- Zoznam používateľov -->
+    <h4>Existing Users</h4>
+    <div th:switch="${users}">
+        <h5 th:case="null">No users yet!</h5>
+        <div th:case="*">
+            <table>
+                <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${users}">
+                    <td th:text="${user.username}"></td>
+                    <td th:text="${user.role}"></td>
+                    <td><a th:href="@{/admin/users/edit/{id}(id=${user.id})}">Edit</a></td>
+                    <td>
+                        <form th:action="@{/admin/users/delete/{id}(id=${user.id})}" method="post">
+                            <button type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

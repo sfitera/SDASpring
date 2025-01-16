@@ -32,8 +32,8 @@
     </p>
   </form>
 
-  <div th:switch="${#lists.size(orderItems)}">
-    <p th:case="0">No order items</p>
+  <div th:switch="${#lists.size(invoiceItems)}">
+    <p th:case="0">No invoice items</p>
     <div th:case="*">
       <table>
         <thead>
@@ -43,10 +43,10 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="item : ${orderItems}">
+        <tr th:each="item : ${invoiceItems}">
           <td th:text="${item.product.name}">Name</td>
           <td th:text="${item.amount}">Amount</td>
-          <td><a th:href="@{/orders/{orderId}/items/{itemId}/delete(orderId=${updateOrder.orderId},itemId=${item.id})}">Delete</a></td>
+          <td><a th:href="@{/invoice/{invoiceId}/items/{itemId}/delete(invoiceId=${updateInvoice.invoiceId},itemId=${item.id})}">Delete</a></td>
         </tr>
       </table>
     </div>

@@ -93,8 +93,8 @@ class InvoiceController {
         var invoice = invoiceService.getInvoice(id);
         model.addAttribute("updateInvoice", new UpdateInvoice(invoice.getId(),invoice.getClient().getId(),invoice.getDate()));
         model.addAttribute("clientList", clientService.getClients());
-        model.addAttribute("orderItems", invoiceService.getAllItemsFor(id));
-        model.addAttribute("createOrderItem", new CreateInvoiceItem());
+        model.addAttribute("invoiceItems", invoiceService.getAllItemsFor(id));
+        model.addAttribute("createInvoiceItem", new CreateInvoiceItem());
         model.addAttribute("productList", productService.getProducts());
         return "edit_invoice";
     }
@@ -103,13 +103,13 @@ class InvoiceController {
     public String addInvoiceItem(@PathVariable("id") String invoiceId, CreateInvoiceItem invoiceItem, Model model) {
         setDefaultValues(model);
         invoiceService.addItemToInvoice(invoiceId, invoiceItem.getProductId(), invoiceItem.getAmount());
-        return "redirect:/orders/edit/" + invoiceId;
+        return "redirect:/invoice/edit/" + invoiceId;
     }
-    @GetMapping("/{orderId}/items/{itemId}/delete")
-    public String deleteInvoiceItem(@PathVariable("orderId") String invoiceId, @PathVariable("itemId") String itemId, Model model) {
+    @GetMapping("/{invoiceId}/items/{itemId}/delete")
+    public String deleteInvoiceItem(@PathVariable("invoiceId") String invoiceId, @PathVariable("itemId") String itemId, Model model) {
         setDefaultValues(model);
         invoiceService.deleteInvoiceItem(invoiceId, itemId);
-        return "redirect:/orders/edit/" + invoiceId;
+        return "redirect:/invoice/edit/" + invoiceId;
     }
 
 }

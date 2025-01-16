@@ -36,10 +36,10 @@ class InvoiceItemApi {
     }
 
     @PostMapping("/add")
-    ResponseEntity<InvoiceItem> addOrderItem(@NonNull @PathVariable("invoiceId") String invoiceId, @RequestBody CreateInvoiceItem invoiceItem) {
+    ResponseEntity<InvoiceItem> addInvoiceItem(@NonNull @PathVariable("invoiceId") String invoiceId, @RequestBody CreateInvoiceItem invoiceItem) {
         InvoiceItem created = invoiceService.addItemToInvoice(invoiceId, invoiceItem.productId(), invoiceItem.amount());
         return ResponseEntity.created(
-                URI.create(String.format("/orders/%s/items/%s", created.getInvoice().getId(), created.getId()))
+                URI.create(String.format("/invoice/%s/items/%s", created.getInvoice().getId(), created.getId()))
         ).body(created);
     }
 

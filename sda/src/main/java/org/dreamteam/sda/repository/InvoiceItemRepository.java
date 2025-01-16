@@ -6,6 +6,6 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.List;
 
 public interface InvoiceItemRepository extends CrudRepository<InvoiceItem,String> {
-    List<InvoiceItem> findAllByInvoiceId(String orderId);
+    List<InvoiceItem> findAllByInvoiceId(String invoiceId);
 
 }

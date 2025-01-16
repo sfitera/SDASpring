@@ -24,4 +24,9 @@ public class InfoController {
         return "info";
     }
 
+    @GetMapping("/")
+    String root(Model model){
+        return "redirect:/clients/";
+    }
+
 }

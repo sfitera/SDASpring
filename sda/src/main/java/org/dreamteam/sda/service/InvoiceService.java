@@ -17,9 +17,9 @@ public interface InvoiceService {
     List<Invoice> getInvoices ();
     Invoice updateInvoice(String id, String clientId, LocalDate localDate);
 
-    InvoiceItem addItemToInvoice(String orderId, @NonNull String productId, int amount);
-    List<InvoiceItem> getAllItemsFor(String orderId);
-    InvoiceItem getInvoiceItem(String orderId, String id);
-    void deleteInvoiceItem(String orderId, String id);
-    InvoiceItem updateInvoiceItem(String orderId, String id, String productId, Integer amount);
+    InvoiceItem addItemToInvoice(String invoiceId, @NonNull String productId, int amount);
+    List<InvoiceItem> getAllItemsFor(String invoiceId);
+    InvoiceItem getInvoiceItem(String invoiceId, String id);
+    void deleteInvoiceItem(String invoiceId, String id);
+    InvoiceItem updateInvoiceItem(String invoiceId, String id, String productId, Integer amount);
 }
